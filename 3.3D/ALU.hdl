@@ -1,0 +1,64 @@
+// This is the ALU for 3.3D - Implement the ALU in HDL
+// Matthew Gray - 212417139 
+// This ALU takes two 16 bit input and conducts a number of operations as directed by the control bits
+// The output of this operation is a 16 bit output, and two control bits.
+// Controls are as follows
+/*
+    input:
+    zx -    Zero x input (x = 0)
+    nx -    Negate x input (!x)
+    zy -    Zero y input (y = 0)
+    ny -    Negate y input (!y)
+    f -     Function (1 - x + y, 0 - x & y)
+    no -    Negate the output
+
+    output:
+    zr -    True if out = 0
+    ng -    True if out < 0
+
+*/
+
+CHIP ALU {
+    IN  x[16], y[16],
+        zx, nx, zy, ny, f, no;
+    OUT out[16],
+        zr, ng;
+
+    PARTS:
+    
+    // zx - Zero x input
+    Mux16(a=x, b=false, sel=zx, out=zeroxout);
+
+    // nx - Negate x input
+    Not16(in=zeroxout, out=notx);
+    Mux16(a=zeroxout, b=notx, sel=nx, out=negxout);
+
+    // zy - Zero y input
+    Mux16(a=y, b=false, sel=zy, out=zeroyout);
+
+    // ny - Negate y input
+    Not16(in=zeroyout, out=noty);
+    Mux16(a=zeroyout, b=noty, sel=ny, out=negyout);
+
+    // f - Function 1 = x + y, 0 = x & y
+    And16(a=negxout, b=negyout, out=xand16y);
+    Add16(a=negxout, b=negyout, out=xadd16y);
+    Mux16(a=xand16y, b=xadd16y, sel=f, out=xfy);
+
+    // no - Negate the total output
+    // Also split the output: 
+    // out[15] defines if an output is negative
+    // out1st8 and out2nd8 are used below to check if the output is 0 or not
+    Not16(in=xfy, out=notxfy);
+    Mux16(a=xfy, b=notxfy, sel=no, out=out, out[0..7]=out1st8, out[8..15]=out2nd8, out[15]=ng);
+
+    // zr - Is the output == 0
+    // Use the 8 Way Or checks to find if there is any ones
+    // IF there is the output of the final Or gate will be one
+    // Thus negate the result to state the required test (zr == 1, if output == 0)
+    Or8Way(in=out1st8, out=onechk1);
+    Or8Way(in=out2nd8, out=onechk2);
+    Or(a=onechk1, b=onechk2, out=full1chk);
+    Not(in=full1chk, out=zr);
+
+}

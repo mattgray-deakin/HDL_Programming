@@ -1,0 +1,13 @@
+// Matthew Gray - 212417139, 3.1P - Implement the Full Adder in HDL
+// This chip is the Full Adder, and is made from two half adders and an OR Gate
+// The input is three bits, the output is a sum bit(LSB) and a carry bit(MSB).
+
+CHIP FullAdder {
+    IN a, b, c;
+    OUT sum, carry;
+
+    PARTS:
+    HalfAdder(a=a, b=b, sum=x1, carry=c1);
+    HalfAdder(a=x1, b=c, sum=sum, carry=c2);
+    Or(a=c1, b=c2, out=carry);
+}

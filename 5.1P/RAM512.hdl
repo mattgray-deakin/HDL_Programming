@@ -1,0 +1,23 @@
+// Matthew Gray - 212417139, Implement RAM512 and RAM4K in HDL
+// This chip is the 512 register RAM Chip.  This is implemented using a number of RAM64 Chips.
+// This chip contain 8 x 64 16-bit wide Registers, an 8 Way de-multiplexor which assists with loading
+// and the address, and an 8 Way multiplexor which identifies which RAM64 output is selected
+// to provide the output for the RAM512 chip.  This chip also has a load toggle which allows a value to be stored.
+
+CHIP RAM512 {
+    IN in[16], load, address[9];
+    OUT out[16];
+
+    PARTS:
+        DMux8Way(in=load, sel=address[6..8], a=aload, b=bload, c=cload, d=dload, e=eload, f=fload, g=gload, h=hload);
+        RAM64(in=in, load=aload, address=address[0..5], out=aram);
+        RAM64(in=in, load=bload, address=address[0..5], out=bram);
+        RAM64(in=in, load=cload, address=address[0..5], out=cram);
+        RAM64(in=in, load=dload, address=address[0..5], out=dram);
+        RAM64(in=in, load=eload, address=address[0..5], out=eram);
+        RAM64(in=in, load=fload, address=address[0..5], out=fram);
+        RAM64(in=in, load=gload, address=address[0..5], out=gram);
+        RAM64(in=in, load=hload, address=address[0..5], out=hram);
+        Mux8Way16(a=aram, b=bram, c=cram, d=dram, e=eram, f=fram, g=gram, h=hram, sel=address[6..8], out=out);
+
+}

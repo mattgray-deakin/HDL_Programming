@@ -1,0 +1,12 @@
+// Matthew Gray - 212417139 - 3.1P - Implement the Full Adder in HDL
+// This chip is the Half Adder, which is a part used in a Full Adder
+// This chip adds two bits together, outputting a sum bit and a carry bit
+
+CHIP HalfAdder {
+    IN a, b;
+    OUT sum, carry;
+
+    PARTS:
+    Xor(a=a, b=b, out=sum);
+    And(a=a, b=b, out=carry);
+}
