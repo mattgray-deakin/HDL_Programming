@@ -1,0 +1,26 @@
+// Matthew Gray - 212417139, 5.2C - Implement the Program Counter in HDL
+// This chip is the 16-bit Program Counter, and is made from an incrementor, 3 Multiplexer Chips
+// and a 16-bit Register.
+
+/**
+/* A 16-bit counter with load and reset control bits.
+*       if reset (t) == 1     out (t+1) = 0                                     SET COUNTER TO ZERO
+* else  if load(t) == 1       out (t+1) = in (t)                                FETCH SPECIFIC INSTRUCTION
+* else  if inc(t) == 1        out (t+1) = out(t) + 1 (integer addition)         FETCH NEXT INSTRUCTION
+* else  out(t+1) = out(t)                                                       NO CHANGE TO COUNTER
+*/
+
+CHIP PC {
+    IN in[16], load, inc, reset;
+    OUT out[16];
+
+    PARTS:
+
+    Inc16(in=feedback, out=incout);
+
+    Mux16(a=feedback, b=incout, sel=inc, out=incmux);
+    Mux16(a=incmux, b=in, sel=load, out=loadmux);
+    Mux16(a=loadmux, b=false, sel=reset, out=resetmux);
+
+    Register(in=resetmux, load=true, out=out, out=feedback);
+}
