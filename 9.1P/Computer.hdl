@@ -1,0 +1,48 @@
+// Matthew Gray - 212417139, 9.1P - Build and Test the Hack Computer.  The hack computer
+// Is comprised of a number of components.  The CPU, the ROM or Instructions Memory and the Data Memory
+// The Data memory comprising the actual Data, Keyboard and Screen.
+
+/** 
+* The HACK computer, including CPU, ROM and RAM.
+* When reset is 0, the program stored in the computer's ROM executes.
+* When reset is 1, the execution of the program restarts. 
+* Thus, to start a program's execution, reset must be pushed "up" (1)
+* and "down" (0). From this point onward the user is at the mercy of 
+* the software. In particular, depending on the program's code, the 
+* screen may show some output and the user may be able to interact 
+* with the computer via the keyboard.
+
+Inputs and Outputs:
+Instruction Memory (ROM32K):
+Input:
+    Program Counter - From CPU
+Output:
+    Instruction - To CPU
+CPU:
+Inputs:
+    InM - Data Memory Input from Data Memory
+    Instruction - From Instruction Memory
+    Reset - Reset Button
+Outputs:
+    WriteM - Data Memory Write Control to Data Memory
+    outM - Data Memory Data output to Data Memory
+    addressM - Address Bus Control Data to Data Memory
+    Program Counter - To Instruction Memory
+
+Data Memory:
+Inputs:
+    writeM - Fm CPU
+    outM - Fm CPU
+    addressM - Fm CPU
+Outputs:
+    inM - to CPU
+**/
+
+CHIP Computer {
+    IN reset;
+
+    PARTS:
+        Memory(in=cpuDataOut, load=cpuMemCntl, address=memAddrReq, out=dmOut);
+        CPU(inM=dmOut, instruction=instOut, writeM=cpuMemCntl, outM=cpuDataOut, addressM=memAddrReq, pc=pcOut, reset=reset);
+        ROM32K(address=pcOut, out=instOut);
+}
